@@ -23,7 +23,6 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
@@ -53,14 +52,6 @@ import (
 	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	transfer "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer"
-	ibctransferkeeper "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/types"
-	ibc "github.com/cosmos/cosmos-sdk/x/ibc/core"
-	ibcclient "github.com/cosmos/cosmos-sdk/x/ibc/core/02-client"
-	porttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/05-port/types"
-	ibchost "github.com/cosmos/cosmos-sdk/x/ibc/core/24-host"
-	ibckeeper "github.com/cosmos/cosmos-sdk/x/ibc/core/keeper"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
@@ -79,6 +70,16 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	transfer "github.com/cosmos/ibc-go/modules/apps/transfer"
+	ibctransferkeeper "github.com/cosmos/ibc-go/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/modules/apps/transfer/types"
+	ibc "github.com/cosmos/ibc-go/modules/core"
+	ibcclient "github.com/cosmos/ibc-go/modules/core/02-client"
+	ibcclienttypes "github.com/cosmos/ibc-go/modules/core/02-client/types"
+	porttypes "github.com/cosmos/ibc-go/modules/core/05-port/types"
+	ibchost "github.com/cosmos/ibc-go/modules/core/24-host"
+	ibckeeper "github.com/cosmos/ibc-go/modules/core/keeper"
+	ibcclientclient "github.com/cosmos/ibc-go/modules/core/02-client/client"
 	appparams "github.com/osmosis-labs/bech32-ibc/app/params"
 	"github.com/osmosis-labs/bech32-ibc/x/bech32ibc"
 	bech32ibckeeper "github.com/osmosis-labs/bech32-ibc/x/bech32ibc/keeper"
@@ -173,7 +174,7 @@ type App struct {
 	*baseapp.BaseApp
 
 	cdc               *codec.LegacyAmino
-	appCodec          codec.Marshaler
+	appCodec          codec.Codec
 	interfaceRegistry types.InterfaceRegistry
 
 	invCheckPeriod uint
@@ -220,13 +221,13 @@ func New(
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
 
-	appCodec := encodingConfig.Marshaler
+	appCodec := encodingConfig.Codec
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 
 	bApp := baseapp.NewBaseApp(Name, logger, db, encodingConfig.TxConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
-	bApp.SetAppVersion(version.Version)
+	//	bApp.SetAppVersion(version.Version)
 	bApp.SetInterfaceRegistry(interfaceRegistry)
 
 	keys := sdk.NewKVStoreKeys(
@@ -299,7 +300,7 @@ func New(
 
 	// Create IBC Keeper
 	app.IBCKeeper = ibckeeper.NewKeeper(
-		appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), app.StakingKeeper, scopedIBCKeeper,
+		appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), app.StakingKeeper, app.UpgradeKeeper, scopedIBCKeeper,
 	)
 
 	// Create Transfer Keepers
@@ -341,7 +342,7 @@ func New(
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		AddRoute(ibchost.RouterKey, ibcclient.NewClientUpdateProposalHandler(app.IBCKeeper.ClientKeeper)).
+		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
 		AddRoute(bech32ibctypes.RouterKey, bech32ibc.NewBech32IBCProposalHandler(app.Bech32IBCKeeper))
 
 	app.GovKeeper = govkeeper.NewKeeper(
@@ -511,7 +512,7 @@ func (app *App) LegacyAmino() *codec.LegacyAmino {
 //
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
-func (app *App) AppCodec() codec.Marshaler {
+func (app *App) AppCodec() codec.Codec {
 	return app.appCodec
 }
 
@@ -586,7 +587,7 @@ func GetMaccPerms() map[string][]string {
 }
 
 // initParamsKeeper init params keeper and its subspaces
-func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyAmino, key, tkey sdk.StoreKey) paramskeeper.Keeper {
+func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino, key, tkey sdk.StoreKey) paramskeeper.Keeper {
 	paramsKeeper := paramskeeper.NewKeeper(appCodec, legacyAmino, key, tkey)
 
 	paramsKeeper.Subspace(authtypes.ModuleName)

@@ -92,7 +92,7 @@ func TestBech32IBCStreamingRelayer(t *testing.T) {
 	require.NoError(t, err)
 
 	// create path
-	_, err = src.CreateClients(dst)
+	_, err = src.CreateClients(dst, true, true, true)
 	require.NoError(t, err)
 	testClientPair(t, src, dst)
 
@@ -105,12 +105,12 @@ func TestBech32IBCStreamingRelayer(t *testing.T) {
 	testChannelPair(t, src, dst)
 
 	// send a couple of transfers to the queue on src
-	require.NoError(t, src.SendTransferMsg(dst, testCoin, dst.MustGetAddress().String(), 0, 0))
-	require.NoError(t, src.SendTransferMsg(dst, testCoin, dst.MustGetAddress().String(), 0, 0))
+	require.NoError(t, src.SendTransferMsg(dst, testCoin, dst.MustGetAddress(), 0, 0))
+	require.NoError(t, src.SendTransferMsg(dst, testCoin, dst.MustGetAddress(), 0, 0))
 
 	// send a couple of transfers to the queue on dst
-	require.NoError(t, dst.SendTransferMsg(src, testCoin, src.MustGetAddress().String(), 0, 0))
-	require.NoError(t, dst.SendTransferMsg(src, testCoin, src.MustGetAddress().String(), 0, 0))
+	require.NoError(t, dst.SendTransferMsg(src, testCoin, src.MustGetAddress(), 0, 0))
+	require.NoError(t, dst.SendTransferMsg(src, testCoin, src.MustGetAddress(), 0, 0))
 
 	validators, err := QueryValidators(dst)
 	require.NoError(t, err)
@@ -193,8 +193,8 @@ func TestBech32IBCStreamingRelayer(t *testing.T) {
 	require.NoError(t, dst.WaitForNBlocks(1))
 
 	// send those tokens from dst back to dst and src back to src
-	require.NoError(t, src.SendTransferMsg(dst, twoTestCoin, dst.MustGetAddress().String(), 0, 0))
-	require.NoError(t, dst.SendTransferMsg(src, twoTestCoin, src.MustGetAddress().String(), 0, 0))
+	require.NoError(t, src.SendTransferMsg(dst, twoTestCoin, dst.MustGetAddress(), 0, 0))
+	require.NoError(t, dst.SendTransferMsg(src, twoTestCoin, src.MustGetAddress(), 0, 0))
 
 	// wait for packet processing
 	require.NoError(t, dst.WaitForNBlocks(6))

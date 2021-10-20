@@ -45,7 +45,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	// Set config for prefixes
 	encodingConfig := app.MakeEncodingConfig()
 	initClientCtx := client.Context{}.
-		WithJSONMarshaler(encodingConfig.Marshaler).
+		WithJSONCodec(encodingConfig.Codec).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
 		WithTxConfig(encodingConfig.TxConfig).
 		WithLegacyAmino(encodingConfig.Amino).
@@ -62,7 +62,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 				return err
 			}
 
-			return server.InterceptConfigsPreRunHandler(cmd)
+			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig)
 		},
 	}
 
@@ -76,7 +76,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
-	authclient.Codec = encodingConfig.Marshaler
+	authclient.Codec = encodingConfig.Codec
 
 	rootCmd.AddCommand(
 		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),

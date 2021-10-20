@@ -10,8 +10,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/bech32"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	ibctransfertypes "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/types"
-	clienttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/02-client/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/modules/apps/transfer/types"
+	clienttypes "github.com/cosmos/ibc-go/modules/core/02-client/types"
 )
 
 type msgServer struct {
@@ -29,7 +29,7 @@ var _ banktypes.MsgServer = msgServer{}
 func (k msgServer) Send(goCtx context.Context, msg *banktypes.MsgSend) (*banktypes.MsgSendResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if err := k.SendEnabledCoins(ctx, msg.Amount...); err != nil {
+	if err := k.IsSendEnabledCoins(ctx, msg.Amount...); err != nil {
 		return nil, err
 	}
 
@@ -111,7 +111,7 @@ func (k msgServer) Send(goCtx context.Context, msg *banktypes.MsgSend) (*banktyp
 		portId,
 		ibcRecord.SourceChannel,
 		msg.Amount[0],
-		from,
+		from.String(),
 		msg.ToAddress,
 		timeoutHeight, 0, // Use no timeouts for now.  Can add this in future.
 	)
@@ -126,7 +126,7 @@ func (k msgServer) MultiSend(goCtx context.Context, msg *banktypes.MsgMultiSend)
 
 	// NOTE: totalIn == totalOut should already have been checked
 	for _, in := range msg.Inputs {
-		if err := k.SendEnabledCoins(ctx, in.Coins...); err != nil {
+		if err := k.IsSendEnabledCoins(ctx, in.Coins...); err != nil {
 			return nil, err
 		}
 	}
