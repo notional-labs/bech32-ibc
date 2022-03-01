@@ -3,7 +3,7 @@ package test
 import (
 	"testing"
 
-	"github.com/cosmos/relayer/relayer"
+	"github.com/cosmos/relayer/v2/relayer"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"

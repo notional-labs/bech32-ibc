@@ -16,7 +16,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/osmosis-labs/bech32-ibc/x/bech32ibc/client/cli"
-	"github.com/osmosis-labs/bech32-ibc/x/bech32ibc/client/rest"
 	"github.com/osmosis-labs/bech32-ibc/x/bech32ibc/keeper"
 	"github.com/osmosis-labs/bech32-ibc/x/bech32ibc/types"
 )
@@ -71,10 +70,6 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncod
 	return genState.Validate()
 }
 
-// RegisterRESTRoutes registers the capability module's REST service handlers.
-func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
-	rest.RegisterRoutes(clientCtx, rtr)
-}
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the module.
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
