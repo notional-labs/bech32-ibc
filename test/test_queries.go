@@ -5,10 +5,10 @@ import (
 	"testing"
 
 	"github.com/avast/retry-go"
-	clientypes "github.com/cosmos/cosmos-sdk/x/ibc/core/02-client/types"
+	clientypes "github.com/cosmos/ibc-go/v5/core/02-client/types"
 	"github.com/stretchr/testify/require"
 
-	ry "github.com/cosmos/relayer/relayer"
+	ry "github.com/cosmos/relayer/relayer/v2"
 )
 
 // testClientPair tests that the client for src on dst and dst on src are the only clients on those chains
@@ -21,9 +21,7 @@ func testClientPair(t *testing.T, src, dst *ry.Chain) {
 func testClient(t *testing.T, src, dst *ry.Chain) {
 	srch, err := src.GetLatestLightHeight()
 	require.NoError(t, err)
-	var (
-		client *clientypes.QueryClientStateResponse
-	)
+	var client *clientypes.QueryClientStateResponse
 	if err = retry.Do(func() error {
 		client, err = src.QueryClientState(srch)
 		if err != nil {

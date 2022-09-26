@@ -10,17 +10,15 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/cosmos/relayer/relayer"
+	relayer "github.com/cosmos/relayer/relayer/v2"
 	bech32ibctypes "github.com/osmosis-labs/bech32-ibc/x/bech32ibc/types"
 	"github.com/stretchr/testify/require"
 )
 
-var (
-	bech32ibcChains = []testChain{
-		{"ibc-0", 0, gaiaTestConfig},
-		{"ibc-1", 1, bech32ibcTestConfig},
-	}
-)
+var bech32ibcChains = []testChain{
+	{"ibc-0", 0, gaiaTestConfig},
+	{"ibc-1", 1, bech32ibcTestConfig},
+}
 
 // QueryHrpIbcRecords queries hrp ibc records
 func QueryHrpIbcRecords(c *relayer.Chain) ([]bech32ibctypes.HrpIbcRecord, error) {

@@ -13,7 +13,7 @@ import (
 	dc "github.com/ory/dockertest/v3/docker"
 	"github.com/stretchr/testify/require"
 
-	ry "github.com/cosmos/relayer/relayer"
+	ry "github.com/cosmos/relayer/relayer/v2"
 
 	sdked25519 "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdkcryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -111,7 +111,8 @@ func removeTestContainer(pool *dockertest.Pool, containerName string) error {
 // A docker image is built for each chain using its provided configuration.
 // This image is then ran using the options set below.
 func spinUpTestContainer(t *testing.T, rchan chan<- *dockertest.Resource,
-	pool *dockertest.Pool, c *ry.Chain, dir string, wg *sync.WaitGroup, tc testChain) {
+	pool *dockertest.Pool, c *ry.Chain, dir string, wg *sync.WaitGroup, tc testChain,
+) {
 	defer wg.Done()
 	var (
 		err      error
@@ -177,7 +178,8 @@ func spinUpTestContainer(t *testing.T, rchan chan<- *dockertest.Resource,
 // cleanUpTest is called as a goroutine to wait until the tests have completed and
 // cleans up the docker containers and relayer config
 func cleanUpTest(t *testing.T, testsDone <-chan struct{}, contDone chan<- struct{},
-	resources []*dockertest.Resource, pool *dockertest.Pool, dir string, chains []*ry.Chain) {
+	resources []*dockertest.Resource, pool *dockertest.Pool, dir string, chains []*ry.Chain,
+) {
 	// block here until tests are complete
 	<-testsDone
 

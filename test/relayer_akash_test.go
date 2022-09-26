@@ -4,16 +4,14 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/relayer/relayer"
+	"github.com/cosmos/relayer/relayer/v2"
 	"github.com/stretchr/testify/require"
 )
 
-var (
-	akashChains = []testChain{
-		{"ibc-0", 0, gaiaTestConfig},
-		{"ibc-1", 1, akashTestConfig},
-	}
-)
+var akashChains = []testChain{
+	{"ibc-0", 0, gaiaTestConfig},
+	{"ibc-1", 1, akashTestConfig},
+}
 
 func TestAkashToGaiaStreamingRelayer(t *testing.T) {
 	chains := spinUpTestChains(t, akashChains...)

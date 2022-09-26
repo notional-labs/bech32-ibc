@@ -5,11 +5,11 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	clienttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/02-client/types"
-	ibctmtypes "github.com/cosmos/cosmos-sdk/x/ibc/light-clients/07-tendermint/types"
-	ibctesting "github.com/cosmos/cosmos-sdk/x/ibc/testing"
-	ibctestingmock "github.com/cosmos/cosmos-sdk/x/ibc/testing/mock"
-	"github.com/cosmos/relayer/relayer"
+	clienttypes "github.com/cosmos/ibc-go/v5/core/02-client/types"
+	ibctmtypes "github.com/cosmos/ibc-go/v5/modules/light-clients/07-tendermint/types"
+	ibctesting "github.com/cosmos/ibc-go/v5/testing"
+	ibctestingmock "github.com/cosmos/ibc-go/v5/testing/mock"
+	relayer "github.com/cosmos/relayer/v2"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
@@ -18,12 +18,10 @@ import (
 	tmversion "github.com/tendermint/tendermint/version"
 )
 
-var (
-	gaiaChains = []testChain{
-		{"ibc-0", 0, gaiaTestConfig},
-		{"ibc-1", 1, gaiaTestConfig},
-	}
-)
+var gaiaChains = []testChain{
+	{"ibc-0", 0, gaiaTestConfig},
+	{"ibc-1", 1, gaiaTestConfig},
+}
 
 func TestGaiaToGaiaStreamingRelayer(t *testing.T) {
 	chains := spinUpTestChains(t, gaiaChains...)
@@ -259,7 +257,8 @@ func TestGaiaMisbehaviourMonitoring(t *testing.T) {
 
 func createTMClientHeader(t *testing.T, chainID string, blockHeight int64, trustedHeight clienttypes.Height,
 	timestamp time.Time, tmValSet, tmTrustedVals *tmtypes.ValidatorSet, signers []tmtypes.PrivValidator,
-	oldHeader *ibctmtypes.Header) *ibctmtypes.Header {
+	oldHeader *ibctmtypes.Header,
+) *ibctmtypes.Header {
 	var (
 		valSet      *tmproto.ValidatorSet
 		trustedVals *tmproto.ValidatorSet
