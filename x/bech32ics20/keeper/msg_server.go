@@ -8,7 +8,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v5/applications/transfer/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v5/apps/transfer/types"
 	clienttypes "github.com/cosmos/ibc-go/v5/core/02-client/types"
 )
 
