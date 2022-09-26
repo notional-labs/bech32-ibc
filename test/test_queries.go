@@ -5,10 +5,10 @@ import (
 	"testing"
 
 	"github.com/avast/retry-go"
-	clientypes "github.com/cosmos/ibc-go/v5/core/02-client/types"
+	clientypes "github.com/cosmos/ibc-go/v5/modules/core/02-client/types"
 	"github.com/stretchr/testify/require"
 
-	ry "github.com/cosmos/relayer/relayer/v2"
+	ry "github.com/cosmos/relayer/v2"
 )
 
 // testClientPair tests that the client for src on dst and dst on src are the only clients on those chains

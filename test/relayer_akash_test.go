@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/relayer/relayer/v2"
+	"github.com/cosmos/relayer/v2"
 	"github.com/stretchr/testify/require"
 )
 

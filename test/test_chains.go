@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/stretchr/testify/require"
 
-	ry "github.com/cosmos/relayer/relayer/v2"
+	ry "github.com/cosmos/relayer/v2"
 )
 
 const (
